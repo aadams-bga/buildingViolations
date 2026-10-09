@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Buildings with obscured ownership more likely to receive 311 complaints than those owned by individuals</title>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+    :root {
+        color-scheme: light;
+        --ink: #1F161A;
+        --ink-2: #574F54;
+        --ink-3: #6E656A;
+        --grid: #DCD4CE;
+        --axis: #B9B0AB;
+        --gold-deep: #D1A93C;
+        --gold-soft: #F3E2A6;
+        --navy-deep: #3D529A;
+        --navy-soft: #7D9BEB;
+        --gray-deep: #8A827F;
+        --gray-soft: #B9B0AB;
+        --paper: #FFFFFF;
+        --font: "Halyard Text", "halyard-text", "Inter", Arial, sans-serif;
+    }
+    html, body { margin: 0; padding: 0; background-color: transparent; }
+    body { display: block; }
+    #chart-container-wrapper {
+        font-family: var(--font);
+        max-width: 640px; width: 100%; min-width: 0; margin: 0 auto;
+        position: relative; z-index: 1; color: var(--ink);
+        padding: 20px 20px 30px 20px; box-sizing: border-box;
+    }
+    #chart-container-wrapper h1 {
+        font-size: 22px; font-weight: 700; margin: 0 0 8px 0; color: var(--ink);
+        line-height: 1.25; letter-spacing: -0.01em; text-wrap: balance;
+    }
+    #chart-container-wrapper p.subtitle {
+        font-size: 14px; color: var(--ink-2); line-height: 1.45; margin: 0 0 14px 0; font-weight: 400;
+    }
+    #chart-legend { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-bottom: 12px; font-size: 11.5px; color: var(--ink-2); }
+    #chart-legend .legend-item { display: flex; align-items: center; gap: 6px; min-width: 0; }
+    #chart-legend .legend-swatch { display: block; width: 12px; height: 12px; flex: 0 0 auto; border: 1px solid rgba(31, 22, 26, 0.18); }
+    #chart-legend .legend-rule { display: block; width: 22px; height: 0; flex: 0 0 auto; border-top: 1px dashed var(--ink); opacity: 0.65; }
+    #chart-container { position: relative; width: 100%; margin: 0 auto; z-index: 10; }
+    #chart-svg { display: block; width: 100%; height: auto; overflow: visible; }
+    .grid-line { stroke: var(--grid); stroke-width: 1px; }
+    .axis-line { stroke: var(--axis); stroke-width: 1px; }
+    .axis-label { font-size: 11px; fill: var(--ink-3); font-family: var(--font); font-variant-numeric: tabular-nums; }
+    .cat-label { font-size: 12.5px; fill: var(--ink); font-family: var(--font); font-weight: 500; }
+    .value-label { font-size: 12px; fill: var(--ink); font-family: var(--font); font-weight: 700; font-variant-numeric: tabular-nums; }
+    .marker-rule { stroke: var(--ink); stroke-width: 1px; stroke-dasharray: 2 3; opacity: 0.65; }
+    .marker-label { font-size: 11px; fill: var(--ink-2); font-family: var(--font); font-weight: 600; }
+    .bar-hit { fill: transparent; cursor: default; }
+    .bar-hit:focus { outline: none; }
+    .bar-row.is-active .bar { opacity: 0.82; }
+    #chart-tooltip {
+        position: absolute; pointer-events: none; display: none; background-color: var(--paper);
+        border: 1px solid var(--axis); box-shadow: 3px 3px 0 rgba(31, 22, 26, 0.12);
+        padding: 8px 11px; font-size: 12px; color: var(--ink); z-index: 100; line-height: 1.45; max-width: 240px;
+        font-family: var(--font);
+    }
+    #chart-tooltip .tooltip-header { font-weight: 700; margin-bottom: 4px; }
+    #chart-tooltip .tooltip-row { display: flex; align-items: baseline; gap: 6px; white-space: nowrap; }
+    #chart-tooltip .tooltip-name { color: var(--ink-2); }
+    #chart-tooltip .tooltip-value { font-weight: 700; margin-left: auto; font-variant-numeric: tabular-nums; }
+    .graph-footer {
+        margin-top: 22px; padding-top: 12px; border-top: 1px solid var(--grid);
+        font-size: 11px; color: var(--ink-3); line-height: 1.4; position: relative; z-index: 1;
+    }
+    .graph-footer a { color: inherit; text-decoration: underline; }
+    .graph-footer .footer-note { margin-bottom: 5px; }
+    .iap-logo { position: absolute; bottom: 10px; right: 10px; width: 150px; opacity: 0.09; z-index: -99999; pointer-events: none; }
+    @media (max-width: 500px) {
+        #chart-container-wrapper { padding: 15px 15px 25px 15px; }
+        #chart-container-wrapper h1 { font-size: 18px; }
+        #chart-container-wrapper p.subtitle { font-size: 12.5px; margin-bottom: 12px; }
+        #chart-legend { font-size: 10.5px; gap: 4px 14px; }
+        .graph-footer { font-size: 10px; }
+        .iap-logo { width: 110px; }
+        .axis-label { font-size: 10px; }
+        .cat-label { font-size: 11.5px; }
+    }
+</style>
+</head>
+<body>
+<div id="chart-container-wrapper">
+    <h1>Buildings with obscured ownership more likely to receive 311 complaints than those owned by individuals</h1>
+    <p class="subtitle">Buildings controlled by individuals are the least likely to receive large numbers of complaints despite making up over half of all buildings that have received 311 complaints in 2026 so far. Meanwhile buildings with hidden owners and buildings controlled by LLCs and other companies are more than 2.5 times more likely to have received five or more complaints this year.</p>
+
+    <div id="chart-wrapper" style="position: relative;">
+        <div id="chart-container">
+            <svg id="chart-svg" role="img" aria-label="Bar chart of the share of properties with five or more building complaints by owner type: LLCs 9.1%, other companies and organizations 9.0%, no named owner 6.1%, land trusts 5.6%, government agencies 3.9%, individuals 3.2%. All properties: 5.1%."></svg>
+        </div>
+        <div id="chart-tooltip"></div>
+    </div>
+
+    <footer class="graph-footer">
+        Chart: Andrew Adams, Illinois Answers Project &middot; Source: <a href="https://data.cityofchicago.org/Service-Requests/311-Service-Requests/v6vf-nfxy" target="_blank" rel="noopener">City of Chicago 311 data</a>, <a href="https://datacatalog.cookcountyil.gov/Property-Taxation/Assessor-Parcel-Addresses/3723-97qp" target="_blank" rel="noopener">Cook County Assessor ownership records</a>, <a href="https://datacatalog.cookcountyil.gov/Boundaries-Districts/Cook-County-Address-Points/78yw-iddh" target="_blank" rel="noopener">Cook County Geographic Information System data</a>
+    </footer>
+    <img src="https://raw.githubusercontent.com/aadams-bga/images/bffe8cc967881aeed4fbdee8328f4b2e056159b9/iaplogo.svg" class="iap-logo" alt="Illinois Answers Project logo">
+</div>
+
+<script>
+(function () {
+    const ALL_PROPERTIES = 5.1;
+
+    const DATA = [
+        { label: "LLCs", pct: 9.1, repeat: 162, total: 1788, color: "#D1A93C" },
+        { label: "Other companies and organizations", pct: 9.0, repeat: 289, total: 3201, color: "#F3E2A6" },
+        { label: "No named owner", pct: 6.1, repeat: 8, total: 132, color: "#3D529A" },
+        { label: "Land trusts", pct: 5.6, repeat: 11, total: 198, color: "#7D9BEB" },
+        { label: "Government agencies", pct: 3.9, repeat: 13, total: 330, color: "#8A827F" },
+        { label: "Individuals", pct: 3.2, repeat: 314, total: 9877, color: "#B9B0AB" }
+    ];
+
+    const container = d3.select("#chart-container");
+    const svg = d3.select("#chart-svg");
+    const tooltip = d3.select("#chart-tooltip");
+    const wrapperNode = d3.select("#chart-wrapper").node();
+    const fmt = d3.format(",");
+
+    function placeTooltip(px, py, width) {
+        const node = tooltip.node();
+        const tw = node.offsetWidth, th = node.offsetHeight;
+        let left = px + 16;
+        if (left + tw > width - 4) left = px - tw - 16;
+        if (left < 4) left = 4;
+        let top = py - th / 2;
+        if (top < 4) top = 4;
+        tooltip.style("left", left + "px").style("top", top + "px");
+    }
+
+    function showTooltip(d) {
+        tooltip.style("display", "block").html(
+            '<div class="tooltip-header">' + d.label + "</div>" +
+            '<div class="tooltip-row"><span class="tooltip-name">With 5+ complaints</span><span class="tooltip-value">' + d.pct.toFixed(1) + "%</span></div>" +
+            '<div class="tooltip-row"><span class="tooltip-name">Properties</span><span class="tooltip-value">' + fmt(d.repeat) + " of " + fmt(d.total) + "</span></div>"
+        );
+    }
+
+    function render() {
+        svg.selectAll("*").remove();
+        tooltip.style("display", "none");
+        const width = container.node().getBoundingClientRect().width;
+        if (!width) return;
+
+        const isMobile = width < 500;
+        const labelW = isMobile ? 0 : 196;
+        const barH = isMobile ? 16 : 20;
+        const rowH = isMobile ? barH + 26 : barH + 14;
+        const margin = { top: 22, right: 44, bottom: 24, left: labelW };
+        const innerWidth = width - margin.left - margin.right;
+        const innerHeight = DATA.length * rowH;
+        const height = innerHeight + margin.top + margin.bottom;
+
+        svg.attr("width", width).attr("height", height).attr("viewBox", "0 0 " + width + " " + height);
+
+        const x = d3.scaleLinear().domain([0, 10]).range([0, innerWidth]);
+        const g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        const ticks = [0, 2, 4, 6, 8, 10];
+        const axisG = g.append("g").attr("transform", "translate(0," + innerHeight + ")");
+        axisG.append("line").attr("class", "axis-line").attr("x1", 0).attr("x2", innerWidth);
+        axisG.selectAll(".axis-label").data(ticks).enter().append("text")
+            .attr("class", "axis-label").attr("x", d => x(d)).attr("y", 16)
+            .attr("text-anchor", d => d === 0 ? "start" : "middle").text(d => d + "%");
+
+        const rows = g.selectAll(".bar-row").data(DATA).enter().append("g")
+            .attr("class", "bar-row")
+            .attr("transform", (d, i) => "translate(0," + i * rowH + ")");
+
+        const barY = isMobile ? 20 : (rowH - barH) / 2;
+        rows.append("text")
+            .attr("class", "cat-label")
+            .attr("x", isMobile ? 0 : -10)
+            .attr("y", isMobile ? 13 : barY + barH / 2)
+            .attr("dy", isMobile ? 0 : "0.35em")
+            .attr("text-anchor", isMobile ? "start" : "end")
+            .text(d => d.label);
+
+        rows.append("rect")
+            .attr("class", "bar")
+            .attr("x", 0).attr("y", barY)
+            .attr("width", d => x(d.pct)).attr("height", barH)
+            .attr("fill", d => d.color);
+
+        rows.append("text")
+            .attr("class", "value-label")
+            .attr("x", d => x(d.pct) + 6).attr("y", barY + barH / 2).attr("dy", "0.35em")
+            .text(d => d.pct.toFixed(1) + "%");
+
+        g.append("line").attr("class", "marker-rule")
+            .attr("x1", x(ALL_PROPERTIES)).attr("x2", x(ALL_PROPERTIES)).attr("y1", -6).attr("y2", innerHeight);
+        g.append("text").attr("class", "marker-label")
+            .attr("x", x(ALL_PROPERTIES)).attr("y", -10).attr("text-anchor", "middle")
+            .text("All properties: 5.1%");
+
+        rows.append("rect")
+            .attr("class", "bar-hit")
+            .attr("x", -labelW).attr("y", 0).attr("width", width).attr("height", rowH)
+            .attr("tabindex", 0)
+            .attr("aria-label", d => d.label + ": " + d.pct.toFixed(1) + "% of " + fmt(d.total) + " properties had five or more complaints")
+            .on("mousemove", function (event, d) {
+                d3.select(this.parentNode).classed("is-active", true);
+                showTooltip(d);
+                const [px, py] = d3.pointer(event, wrapperNode);
+                placeTooltip(px, py, width);
+            })
+            .on("focus", function (event, d) {
+                d3.select(this.parentNode).classed("is-active", true);
+                showTooltip(d);
+                placeTooltip(margin.left + x(d.pct), margin.top + DATA.indexOf(d) * rowH + rowH / 2, width);
+            })
+            .on("mouseleave blur", function () {
+                d3.select(this.parentNode).classed("is-active", false);
+                tooltip.style("display", "none");
+            });
+    }
+
+    render();
+    window.addEventListener("resize", render);
+
+    (function () {
+        if (window.parent === window) return;
+        let last = 0;
+        function send(force) {
+            const h = Math.ceil(document.documentElement.getBoundingClientRect().height);
+            if (!h || (!force && Math.abs(h - last) < 2)) return;
+            last = h;
+            window.parent.postMessage({ type: "iap-graphic-height", id: "ownerRepeatComplaints", height: h }, "*");
+        }
+        window.addEventListener("load", send);
+        window.addEventListener("resize", send);
+        if (window.ResizeObserver) new ResizeObserver(send).observe(document.body);
+        setTimeout(send, 300);
+        setTimeout(send, 1200);
+        window.addEventListener("message", function (e) {
+            if (e.data && e.data.type === "iap-graphic-request") send(true);
+        });
+    })();
+})();
+</script>
+</body>
+</html>
