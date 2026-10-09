@@ -8,7 +8,8 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://use.typekit.net/hid5kve.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;600&display=swap" rel="stylesheet">
 <style>
     :root {
         color-scheme: light;
@@ -24,7 +25,8 @@
         --gray-deep: #8A827F;
         --gray-soft: #B9B0AB;
         --paper: #FFFFFF;
-        --font: "Halyard Text", "halyard-text", "Inter", Arial, sans-serif;
+        --font: "halyard-text", "Halyard Text", "Inter", Arial, sans-serif;
+        --font-display: "halyard-display", "Halyard Display", "Inter", Arial, sans-serif;
     }
     html, body { margin: 0; padding: 0; background-color: transparent; }
     body { display: block; }
@@ -35,11 +37,11 @@
         padding: 20px 20px 30px 20px; box-sizing: border-box;
     }
     #chart-container-wrapper h1 {
-        font-size: 22px; font-weight: 700; margin: 0 0 8px 0; color: var(--ink);
+        font-family: var(--font-display); font-size: 22px; font-weight: 600; margin: 0 0 8px 0; color: var(--ink);
         line-height: 1.25; letter-spacing: -0.01em; text-wrap: balance;
     }
     #chart-container-wrapper p.subtitle {
-        font-size: 14px; color: var(--ink-2); line-height: 1.45; margin: 0 0 14px 0; font-weight: 400;
+        font-size: 14px; color: var(--ink-2); line-height: 1.45; margin: 0 0 14px 0; font-weight: 300;
     }
     #chart-legend { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-bottom: 12px; font-size: 11.5px; color: var(--ink-2); }
     #chart-legend .legend-item { display: flex; align-items: center; gap: 6px; min-width: 0; }
@@ -51,7 +53,7 @@
     .axis-line { stroke: var(--axis); stroke-width: 1px; }
     .axis-label { font-size: 11px; fill: var(--ink-3); font-family: var(--font); font-variant-numeric: tabular-nums; }
     .cat-label { font-size: 12.5px; fill: var(--ink); font-family: var(--font); font-weight: 500; }
-    .value-label { font-size: 12px; fill: var(--ink); font-family: var(--font); font-weight: 700; font-variant-numeric: tabular-nums; }
+    .value-label { font-size: 12px; fill: var(--ink); font-family: var(--font); font-weight: 600; font-variant-numeric: tabular-nums; }
     .marker-rule { stroke: var(--ink); stroke-width: 1px; stroke-dasharray: 2 3; opacity: 0.65; }
     .marker-label { font-size: 11px; fill: var(--ink-2); font-family: var(--font); font-weight: 600; }
     .bar-hit { fill: transparent; cursor: default; }
@@ -63,10 +65,10 @@
         padding: 8px 11px; font-size: 12px; color: var(--ink); z-index: 100; line-height: 1.45; max-width: 240px;
         font-family: var(--font);
     }
-    #chart-tooltip .tooltip-header { font-weight: 700; margin-bottom: 4px; }
+    #chart-tooltip .tooltip-header { font-weight: 600; margin-bottom: 4px; }
     #chart-tooltip .tooltip-row { display: flex; align-items: baseline; gap: 6px; white-space: nowrap; }
     #chart-tooltip .tooltip-name { color: var(--ink-2); }
-    #chart-tooltip .tooltip-value { font-weight: 700; margin-left: auto; font-variant-numeric: tabular-nums; }
+    #chart-tooltip .tooltip-value { font-weight: 600; margin-left: auto; font-variant-numeric: tabular-nums; }
     .graph-footer {
         margin-top: 22px; padding-top: 12px; border-top: 1px solid var(--grid);
         font-size: 11px; color: var(--ink-3); line-height: 1.4; position: relative; z-index: 1;
