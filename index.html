@@ -69,10 +69,21 @@
     #chart-tooltip .tooltip-row { display: flex; align-items: baseline; gap: 6px; white-space: nowrap; }
     #chart-tooltip .tooltip-name { color: var(--ink-2); }
     #chart-tooltip .tooltip-value { font-weight: 600; margin-left: auto; font-variant-numeric: tabular-nums; }
-    .methodology { margin-top: 18px; font-size: 12.5px; color: var(--ink-2); line-height: 1.5; }
-    .methodology summary { cursor: pointer; font-weight: 600; color: var(--ink); }
-    .methodology summary:focus-visible { outline: 2px solid var(--navy-deep); outline-offset: 2px; }
-    .methodology p { margin: 10px 0 0 0; font-weight: 300; }
+    .methodology {
+        margin-top: 18px; border: 1px solid var(--grid); background: rgba(220, 212, 206, 0.18);
+        font-size: 12.5px; color: var(--ink-2); line-height: 1.55;
+    }
+    .methodology summary {
+        list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px;
+        padding: 10px 14px; font-weight: 600; font-size: 12.5px; color: var(--ink);
+    }
+    .methodology summary::-webkit-details-marker { display: none; }
+    .methodology summary::after { content: "+"; font-size: 16px; font-weight: 300; line-height: 1; color: var(--ink-2); }
+    .methodology[open] summary::after { content: "\2212"; }
+    .methodology[open] summary { border-bottom: 1px solid var(--grid); }
+    .methodology summary:focus-visible { outline: 2px solid var(--navy-deep); outline-offset: -2px; }
+    .methodology p { margin: 0; padding: 10px 14px 0 14px; font-weight: 300; }
+    .methodology p:last-child { padding-bottom: 14px; }
     .graph-footer {
         margin-top: 22px; padding-top: 12px; border-top: 1px solid var(--grid);
         font-size: 11px; color: var(--ink-3); line-height: 1.4; position: relative; z-index: 1;
@@ -105,6 +116,10 @@
         <div id="chart-tooltip"></div>
     </div>
 
+    <footer class="graph-footer">
+        Chart: Andrew Adams, Illinois Answers Project &middot; Source: <a href="https://data.cityofchicago.org/Service-Requests/311-Service-Requests/v6vf-nfxy" target="_blank" rel="noopener">City of Chicago 311 data</a>, <a href="https://datacatalog.cookcountyil.gov/Property-Taxation/Assessor-Parcel-Addresses/3723-97qp" target="_blank" rel="noopener">Cook County Assessor ownership records</a>, <a href="https://datacatalog.cookcountyil.gov/Boundaries-Districts/Cook-County-Address-Points/78yw-iddh" target="_blank" rel="noopener">Cook County Geographic Information System data</a>
+    </footer>
+
     <details class="methodology">
         <summary>How we calculated these numbers</summary>
         <p>To calculate the numbers we used in this story, we compared publicly available 311 complaint data to data from Cook County containing records of who owns and is paying taxes on specific properties and which addresses correspond to which property tax identification numbers. Using this method, we were able to match about 88% of complaints to property tax records showing ownership. The ones we weren’t able to match are likely the result of erroneous data entry — missing street numbers, addresses that don’t exist — or other issues.</p>
@@ -112,10 +127,6 @@
         <p>These steps identified whether the ownership data showed a person, organization, LLC, land trust or other entity. For each complaint, we categorized it as being owned or controlled by an individual person if Cook County tax records identified the property owner or the individual at the owner’s mailing address (which can be a business office parent company) as having a person-like name. For the rest, we used the county’s record of who owns the property.</p>
         <p>Finally, we conducted randomized tests on a subsample of the data to check that our categorization system is accurate. While there may be some categorization errors due to messy data or the probabilistic nature of our categorization, we stand by the conclusions we reached in the analysis.</p>
     </details>
-
-    <footer class="graph-footer">
-        Chart: Andrew Adams, Illinois Answers Project &middot; Source: <a href="https://data.cityofchicago.org/Service-Requests/311-Service-Requests/v6vf-nfxy" target="_blank" rel="noopener">City of Chicago 311 data</a>, <a href="https://datacatalog.cookcountyil.gov/Property-Taxation/Assessor-Parcel-Addresses/3723-97qp" target="_blank" rel="noopener">Cook County Assessor ownership records</a>, <a href="https://datacatalog.cookcountyil.gov/Boundaries-Districts/Cook-County-Address-Points/78yw-iddh" target="_blank" rel="noopener">Cook County Geographic Information System data</a>
-    </footer>
     <img src="https://raw.githubusercontent.com/aadams-bga/images/bffe8cc967881aeed4fbdee8328f4b2e056159b9/iaplogo.svg" class="iap-logo" alt="Illinois Answers Project logo">
 </div>
 
