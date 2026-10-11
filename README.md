@@ -1,8 +1,8 @@
 Embed code: 
 
 <iframe
-  id="ownerRepeatComplaints"
-  src="https://aadams-bga.github.io/<repo-name>/ownerRepeatComplaints/"
+  id="buildingViolations"
+  src="https://aadams-bga.github.io/buildingViolations/"
   title="Buildings with obscured ownership more likely to receive 311 complaints than those owned by individuals"
   width="100%"
   height="560"
