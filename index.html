@@ -69,21 +69,13 @@
     #chart-tooltip .tooltip-row { display: flex; align-items: baseline; gap: 6px; white-space: nowrap; }
     #chart-tooltip .tooltip-name { color: var(--ink-2); }
     #chart-tooltip .tooltip-value { font-weight: 600; margin-left: auto; font-variant-numeric: tabular-nums; }
-    .methodology {
-        margin-top: 18px; border: 1px solid var(--grid); background: rgba(220, 212, 206, 0.18);
-        font-size: 12.5px; color: var(--ink-2); line-height: 1.55;
-    }
-    .methodology summary {
-        list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 12px;
-        padding: 10px 14px; font-weight: 600; font-size: 12.5px; color: var(--ink);
-    }
+    .methodology { margin-top: 10px; font-size: 11px; color: var(--ink-3); line-height: 1.5; }
+    .methodology summary { list-style: none; cursor: pointer; display: inline-block; color: var(--ink-2); text-decoration: underline; text-underline-offset: 2px; }
     .methodology summary::-webkit-details-marker { display: none; }
-    .methodology summary::after { content: "+"; font-size: 16px; font-weight: 300; line-height: 1; color: var(--ink-2); }
-    .methodology[open] summary::after { content: "\2212"; }
-    .methodology[open] summary { border-bottom: 1px solid var(--grid); }
-    .methodology summary:focus-visible { outline: 2px solid var(--navy-deep); outline-offset: -2px; }
-    .methodology p { margin: 0; padding: 10px 14px 0 14px; font-weight: 300; }
-    .methodology p:last-child { padding-bottom: 14px; }
+    .methodology summary::after { content: " +"; }
+    .methodology[open] summary::after { content: " \2212"; }
+    .methodology summary:focus-visible { outline: 2px solid var(--navy-deep); outline-offset: 2px; }
+    .methodology p { margin: 6px 0 0 0; font-weight: 300; }
     .graph-footer {
         margin-top: 22px; padding-top: 12px; border-top: 1px solid var(--grid);
         font-size: 11px; color: var(--ink-3); line-height: 1.4; position: relative; z-index: 1;
@@ -97,7 +89,7 @@
         #chart-container-wrapper p.subtitle { font-size: 12.5px; margin-bottom: 12px; }
         #chart-legend { font-size: 10.5px; gap: 4px 14px; }
         .graph-footer { font-size: 10px; }
-        .methodology { font-size: 11.5px; }
+        .methodology { font-size: 10px; }
         .iap-logo { width: 110px; }
         .axis-label { font-size: 10px; }
         .cat-label { font-size: 11.5px; }
@@ -107,11 +99,11 @@
 <body>
 <div id="chart-container-wrapper">
     <h1>Buildings with obscured or corporate ownership more likely to receive 311 complaints than those owned by individuals</h1>
-    <p class="subtitle">Buildings controlled by individuals are the least likely to receive large numbers of complaints despite making up over half of all buildings that have received 311 complaints in 2026 so far. Meanwhile buildings with hidden owners and buildings controlled by LLCs and other companies are more than 2.5 times more likely to have received five or more complaints this year.</p>
+    <p class="subtitle">Buildings controlled by individuals are the least likely to receive large numbers of complaints despite making up over half of all buildings that have received 311 complaints in 2026 so far. Meanwhile, buildings with hidden owners and buildings controlled by LLCs and other companies are about 3 times more likely to have received five or more complaints this year.</p>
 
     <div id="chart-wrapper" style="position: relative;">
         <div id="chart-container">
-            <svg id="chart-svg" role="img" aria-label="Bar chart of the share of properties with five or more building complaints by owner type: LLCs 9.1%, other companies and organizations 9.0%, no named owner 6.1%, land trusts 5.6%, government agencies 3.9%, individuals 3.2%. All properties: 5.1%."></svg>
+            <svg id="chart-svg" role="img" aria-label="Bar chart of the share of properties with five or more building complaints by owner type: other companies and organizations 9.1%, LLCs 9.0%, no named owner 6.0%, land trusts 5.5%, government agencies 3.9%, individuals 3.1%. All properties: 5.1%."></svg>
         </div>
         <div id="chart-tooltip"></div>
     </div>
@@ -125,22 +117,22 @@
         <p>To calculate the numbers we used in this story, we compared publicly available 311 complaint data to data from Cook County containing records of who owns and is paying taxes on specific properties and which addresses correspond to which property tax identification numbers. Using this method, we were able to match about 88% of complaints to property tax records showing ownership. The ones we weren’t able to match are likely the result of erroneous data entry — missing street numbers, addresses that don’t exist — or other issues.</p>
         <p>We then combined a complex keyword analysis — looking for terms like “LLC”, “Partners”, “Trust” and others — alongside a python library developed by DataMade which uses a statistical model to probabilistically identify unstructured romanized names and company names.</p>
         <p>These steps identified whether the ownership data showed a person, organization, LLC, land trust or other entity. For each complaint, we categorized it as being owned or controlled by an individual person if Cook County tax records identified the property owner or the individual at the owner’s mailing address (which can be a business office parent company) as having a person-like name. For the rest, we used the county’s record of who owns the property.</p>
-        <p>Finally, we conducted randomized tests on a subsample of the data to check that our categorization system is accurate. We found a 96.3% to 99.2% accuracy of the categorization of the data, indicating that our conculsions are accurate.</p>
+        <p>Finally, we conducted randomized tests on a subsample of the data to check that our categorization system is accurate. We found a 95.8% to 98.8% accuracy of the categorization of the data, indicating that our conclusions are accurate.</p>
     </details>
     <img src="https://raw.githubusercontent.com/aadams-bga/images/bffe8cc967881aeed4fbdee8328f4b2e056159b9/iaplogo.svg" class="iap-logo" alt="Illinois Answers Project logo">
 </div>
 
 <script>
 (function () {
-    const ALL_PROPERTIES = 5.1;
+    const ALL_PROPERTIES = 793 / 15473 * 100;
 
     const DATA = [
-        { label: "LLCs", pct: 9.1, repeat: 162, total: 1788, color: "#D1A93C" },
-        { label: "Other companies and organizations", pct: 9.0, repeat: 289, total: 3201, color: "#F3E2A6" },
-        { label: "No named owner", pct: 6.1, repeat: 8, total: 132, color: "#3D529A" },
-        { label: "Land trusts", pct: 5.6, repeat: 11, total: 198, color: "#7D9BEB" },
-        { label: "Government agencies", pct: 3.9, repeat: 13, total: 330, color: "#8A827F" },
-        { label: "Individuals", pct: 3.2, repeat: 314, total: 9877, color: "#B9B0AB" }
+        { label: "Other companies and organizations", pct: 290 / 3204 * 100, repeat: 290, total: 3204, color: "#F3E2A6" },
+        { label: "LLCs", pct: 162 / 1791 * 100, repeat: 162, total: 1791, color: "#D1A93C" },
+        { label: "No named owner", pct: 8 / 133 * 100, repeat: 8, total: 133, color: "#3D529A" },
+        { label: "Land trusts", pct: 11 / 199 * 100, repeat: 11, total: 199, color: "#7D9BEB" },
+        { label: "Government agencies", pct: 13 / 330 * 100, repeat: 13, total: 330, color: "#8A827F" },
+        { label: "Individuals", pct: 309 / 9816 * 100, repeat: 309, total: 9816, color: "#B9B0AB" }
     ];
 
     const container = d3.select("#chart-container");
