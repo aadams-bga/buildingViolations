@@ -85,8 +85,8 @@
 </head>
 <body>
 <div id="chart-container-wrapper">
-    <h1>Buildings with obscured or corporate ownership more likely to receive 311 complaints than those owned by named individuals</h1>
-    <p class="subtitle">Buildings controlled by named individuals are the least likely to receive large numbers of complaints despite making up over half of all buildings that have received 311 complaints in 2026 so far. Meanwhile, buildings with hidden owners and buildings controlled by LLCs and other companies are about 3 times more likely to have received five or more complaints this year.</p>
+    <h1>Buildings with obscured or corporate ownership more likely to receive 311 complaints than those owned by individuals</h1>
+    <p class="subtitle">Buildings controlled by individuals are the least likely to receive large numbers of complaints despite making up over half of all buildings that have received 311 complaints in 2026 so far. Meanwhile, buildings with hidden owners and buildings controlled by LLCs and other companies are about 3 times more likely to have received five or more complaints this year.</p>
 
     <div id="chart-wrapper" style="position: relative;">
         <div id="chart-container">
@@ -118,7 +118,7 @@
         { label: "No named owner", pct: 6.015037594, repeat: 8, total: 133, color: "#3D529A" },
         { label: "Trusts", pct: 5.527638191, repeat: 11, total: 199, color: "#7D9BEB" },
         { label: "Government agencies", pct: 3.939393939, repeat: 13, total: 330, color: "#8A827F" },
-        { label: "Named individuals", pct: 3.14792176, repeat: 309, total: 9816, color: "#B9B0AB" }
+        { label: "Individuals", pct: 3.14792176, repeat: 309, total: 9816, color: "#B9B0AB" }
     ];
 
     const container = d3.select("#chart-container");
@@ -196,6 +196,7 @@
         window.addEventListener("load", send);
         window.addEventListener("resize", send);
         if (window.ResizeObserver) new ResizeObserver(send).observe(document.body);
+        document.querySelector(".methodology").addEventListener("toggle", function () { send(true); });
         setTimeout(send, 300);
         setTimeout(send, 1200);
         window.addEventListener("message", function (e) {
