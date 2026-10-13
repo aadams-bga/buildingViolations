@@ -56,19 +56,6 @@
     .value-label { font-size: 12px; fill: var(--ink); font-family: var(--font); font-weight: 600; font-variant-numeric: tabular-nums; }
     .marker-rule { stroke: var(--ink); stroke-width: 1px; stroke-dasharray: 2 3; opacity: 0.65; }
     .marker-label { font-size: 11px; fill: var(--ink-2); font-family: var(--font); font-weight: 600; }
-    .bar-hit { fill: transparent; cursor: default; }
-    .bar-hit:focus { outline: none; }
-    .bar-row.is-active .bar { opacity: 0.82; }
-    #chart-tooltip {
-        position: absolute; pointer-events: none; display: none; background-color: var(--paper);
-        border: 1px solid var(--axis); box-shadow: 3px 3px 0 rgba(31, 22, 26, 0.12);
-        padding: 8px 11px; font-size: 12px; color: var(--ink); z-index: 100; line-height: 1.45; max-width: 240px;
-        font-family: var(--font);
-    }
-    #chart-tooltip .tooltip-header { font-weight: 600; margin-bottom: 4px; }
-    #chart-tooltip .tooltip-row { display: flex; align-items: baseline; gap: 6px; white-space: nowrap; }
-    #chart-tooltip .tooltip-name { color: var(--ink-2); }
-    #chart-tooltip .tooltip-value { font-weight: 600; margin-left: auto; font-variant-numeric: tabular-nums; }
     .methodology { margin-top: 10px; font-size: 11px; color: var(--ink-3); line-height: 1.5; }
     .methodology summary { list-style: none; cursor: pointer; display: inline-block; color: var(--ink-2); text-decoration: underline; text-underline-offset: 2px; }
     .methodology summary::-webkit-details-marker { display: none; }
@@ -105,7 +92,6 @@
         <div id="chart-container">
             <svg id="chart-svg" role="img" aria-label="Bar chart of the share of properties with five or more building complaints by owner type: other companies and organizations 9.1%, LLCs 9.0%, no named owner 6.0%, land trusts 5.5%, government agencies 3.9%, individuals 3.1%. All properties: 5.1%."></svg>
         </div>
-        <div id="chart-tooltip"></div>
     </div>
 
     <footer class="graph-footer">
@@ -127,42 +113,19 @@
     const ALL_PROPERTIES = 793 / 15473 * 100;
 
     const DATA = [
-        { label: "Other companies and organizations", pct: 290 / 3204 * 100, repeat: 290, total: 3204, color: "#F3E2A6" },
-        { label: "LLCs", pct: 162 / 1791 * 100, repeat: 162, total: 1791, color: "#D1A93C" },
+        { label: "Companies and organizations", pct: 0.09051186017, repeat: 290, total: 3204, color: "#F3E2A6" },
+        { label: "LLCs", pct: 0.09045226131, repeat: 162, total: 1791, color: "#D1A93C" },
         { label: "No named owner", pct: 8 / 133 * 100, repeat: 8, total: 133, color: "#3D529A" },
-        { label: "Land trusts", pct: 11 / 199 * 100, repeat: 11, total: 199, color: "#7D9BEB" },
-        { label: "Government agencies", pct: 13 / 330 * 100, repeat: 13, total: 330, color: "#8A827F" },
-        { label: "Individuals", pct: 309 / 9816 * 100, repeat: 309, total: 9816, color: "#B9B0AB" }
+        { label: "Trusts", pct: 0.05527638191, repeat: 11, total: 199, color: "#7D9BEB" },
+        { label: "Government agencies", pct: 0.03939393939, repeat: 13, total: 330, color: "#8A827F" },
+        { label: "Individuals", pct: 0.0314792176, repeat: 309, total: 9816, color: "#B9B0AB" }
     ];
 
     const container = d3.select("#chart-container");
     const svg = d3.select("#chart-svg");
-    const tooltip = d3.select("#chart-tooltip");
-    const wrapperNode = d3.select("#chart-wrapper").node();
-    const fmt = d3.format(",");
-
-    function placeTooltip(px, py, width) {
-        const node = tooltip.node();
-        const tw = node.offsetWidth, th = node.offsetHeight;
-        let left = px + 16;
-        if (left + tw > width - 4) left = px - tw - 16;
-        if (left < 4) left = 4;
-        let top = py - th / 2;
-        if (top < 4) top = 4;
-        tooltip.style("left", left + "px").style("top", top + "px");
-    }
-
-    function showTooltip(d) {
-        tooltip.style("display", "block").html(
-            '<div class="tooltip-header">' + d.label + "</div>" +
-            '<div class="tooltip-row"><span class="tooltip-name">With 5+ complaints</span><span class="tooltip-value">' + d.pct.toFixed(1) + "%</span></div>" +
-            '<div class="tooltip-row"><span class="tooltip-name">Properties</span><span class="tooltip-value">' + fmt(d.repeat) + " of " + fmt(d.total) + "</span></div>"
-        );
-    }
 
     function render() {
         svg.selectAll("*").remove();
-        tooltip.style("display", "none");
         const width = container.node().getBoundingClientRect().width;
         if (!width) return;
 
@@ -216,27 +179,6 @@
         g.append("text").attr("class", "marker-label")
             .attr("x", x(ALL_PROPERTIES)).attr("y", -10).attr("text-anchor", "middle")
             .text("All properties: 5.1%");
-
-        rows.append("rect")
-            .attr("class", "bar-hit")
-            .attr("x", -labelW).attr("y", 0).attr("width", width).attr("height", rowH)
-            .attr("tabindex", 0)
-            .attr("aria-label", d => d.label + ": " + d.pct.toFixed(1) + "% of " + fmt(d.total) + " properties had five or more complaints")
-            .on("mousemove", function (event, d) {
-                d3.select(this.parentNode).classed("is-active", true);
-                showTooltip(d);
-                const [px, py] = d3.pointer(event, wrapperNode);
-                placeTooltip(px, py, width);
-            })
-            .on("focus", function (event, d) {
-                d3.select(this.parentNode).classed("is-active", true);
-                showTooltip(d);
-                placeTooltip(margin.left + x(d.pct), margin.top + DATA.indexOf(d) * rowH + rowH / 2, width);
-            })
-            .on("mouseleave blur", function () {
-                d3.select(this.parentNode).classed("is-active", false);
-                tooltip.style("display", "none");
-            });
     }
 
     render();
